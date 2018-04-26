@@ -7,7 +7,7 @@ Dialog::Dialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    QString sPath = "/home";
+    QString sPath = QDir::homePath();
     dirmodel = new QFileSystemModel(this);
     dirmodel->setFilter(QDir::NoDotAndDotDot | QDir::AllDirs);
     dirmodel ->setRootPath(sPath);
@@ -17,7 +17,6 @@ Dialog::Dialog(QWidget *parent) :
     filemodel->setFilter(QDir::NoDotAndDotDot | QDir::Files);
     filemodel ->setRootPath(sPath);
     ui->listView->setModel(filemodel);
-
 }
 
 Dialog::~Dialog()

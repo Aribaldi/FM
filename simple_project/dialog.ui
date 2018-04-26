@@ -6,16 +6,29 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>408</width>
-    <height>344</height>
+    <width>1000</width>
+    <height>1000</height>
    </rect>
+  </property>
+  <property name="baseSize">
+   <size>
+    <width>8</width>
+    <height>12</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
-    <widget class="QTreeView" name="treeView"/>
+    <widget class="QTreeView" name="treeView">
+     <property name="minimumSize">
+      <size>
+       <width>192</width>
+       <height>326</height>
+      </size>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="QListView" name="listView"/>
