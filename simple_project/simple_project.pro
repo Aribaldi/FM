@@ -29,3 +29,4 @@ SOURCES += main.cpp\
 HEADERS  += dialog.h
 
 FORMS    += dialog.ui
+CONFIG   += c++14
