@@ -9,6 +9,8 @@
 #include <QDir>
 #include <QDesktopWidget>
 #include <QMainWindow>
+#include <QDirModel>
+#include <QInputDialog>
 
 namespace Ui {
 class Dialog;
@@ -27,10 +29,13 @@ private slots:
 
     void on_pushButton_clicked();
 
+    void on_pushButton_2_clicked();
+
 private:
     Ui::Dialog *ui;
     QFileSystemModel *dirmodel;
     QFileSystemModel *filemodel;
+    QDirModel *model;
 };
 
 #endif // DIALOG_H
