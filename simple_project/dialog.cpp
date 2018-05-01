@@ -11,12 +11,27 @@ Dialog::Dialog(QWidget *parent) :
     dirmodel = new QFileSystemModel(this);
     dirmodel->setFilter(QDir::NoDotAndDotDot | QDir::AllDirs);
     dirmodel ->setRootPath(sPath);
+    dirmodel->setReadOnly(false);
     ui->treeView->setModel(dirmodel);
+    ui->treeView->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->treeView, SIGNAL(customContextMenuRequested(const QPoint &)),
+            this, SLOT(ProvideContextMenu_dirs(const QPoint &)));
+
+    QModelIndex index_n = dirmodel->index("/home/aribaldi");
+    ui->treeView->expand(index_n);
+    ui->treeView->scrollTo(index_n);
+    ui->treeView->setCurrentIndex(index_n);
+    ui->treeView->resizeColumnToContents(0);
 
     filemodel  = new QFileSystemModel(this);
     filemodel->setFilter(QDir::NoDotAndDotDot | QDir::Files);
     filemodel ->setRootPath(sPath);
+    filemodel->setReadOnly(false);
+
     ui->listView->setModel(filemodel);
+    ui->listView->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->listView, SIGNAL(customContextMenuRequested(const QPoint &)),
+            this, SLOT(ProvideContextMenu_files(const QPoint &)));
 }
 
 Dialog::~Dialog()
@@ -41,14 +56,27 @@ void Dialog::on_pushButton_2_clicked()
     dirmodel->mkdir(index,name);
 }
 
-void Dialog::on_pushButton_clicked()
+void Dialog::ProvideContextMenu_dirs(const QPoint &pos)
 {
-    //remove
     QModelIndex index = ui->treeView->currentIndex();
-    if (!index.isValid()) return;
-    dirmodel->rmdir(index);
-
-    QModelIndex index2 = ui->listView->currentIndex();
-    if (!index2.isValid()) return;
-    filemodel->remove(index2);
+    QPoint item = ui->treeView->mapToGlobal(pos);
+    QMenu submenu;
+    submenu.addAction("Remove");
+    QAction* rightClickItem = submenu.exec(item);
+    if (rightClickItem && rightClickItem->text().contains("Remove"))
+    {dirmodel->remove(index);};
 }
+
+void Dialog::ProvideContextMenu_files(const QPoint &pos)
+{
+    QModelIndex index = ui->listView->currentIndex();
+    QPoint item = ui->listView->mapToGlobal(pos);
+    QMenu submenu;
+    submenu.addAction("Remove");
+    QAction* rightClickItem = submenu.exec(item);
+    if (rightClickItem && rightClickItem->text().contains("Remove"))
+    {filemodel->remove(index);};
+}
+
+
+

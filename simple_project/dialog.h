@@ -11,6 +11,8 @@
 #include <QMainWindow>
 #include <QDirModel>
 #include <QInputDialog>
+#include <QMessageBox>
+#include <QMenu>
 
 namespace Ui {
 class Dialog;
@@ -30,6 +32,10 @@ private slots:
     void on_pushButton_clicked();
 
     void on_pushButton_2_clicked();
+
+    void ProvideContextMenu_dirs(const QPoint &);
+
+    void ProvideContextMenu_files(const QPoint &);
 
 private:
     Ui::Dialog *ui;
