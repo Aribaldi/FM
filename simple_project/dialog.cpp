@@ -17,11 +17,6 @@ Dialog::Dialog(QWidget *parent) :
     connect(ui->treeView, SIGNAL(customContextMenuRequested(const QPoint &)),
             this, SLOT(ProvideContextMenu_dirs(const QPoint &)));
 
-    QModelIndex index_n = dirmodel->index("/home/aribaldi");
-    ui->treeView->expand(index_n);
-    ui->treeView->scrollTo(index_n);
-    ui->treeView->setCurrentIndex(index_n);
-    ui->treeView->resizeColumnToContents(0);
 
     filemodel  = new QFileSystemModel(this);
     filemodel->setFilter(QDir::NoDotAndDotDot | QDir::Files);
@@ -70,12 +65,17 @@ void Dialog::ProvideContextMenu_dirs(const QPoint &pos)
 void Dialog::ProvideContextMenu_files(const QPoint &pos)
 {
     QModelIndex index = ui->listView->currentIndex();
+    QString startpath = filemodel->filePath(index);
     QPoint item = ui->listView->mapToGlobal(pos);
     QMenu submenu;
     submenu.addAction("Remove");
+    submenu.addAction("Copy");
     QAction* rightClickItem = submenu.exec(item);
     if (rightClickItem && rightClickItem->text().contains("Remove"))
     {filemodel->remove(index);};
+    if (rightClickItem && rightClickItem->text().contains("Copy"))
+    {QString dest = QFileDialog::getExistingDirectory(this,tr("Open directory"),"/home",QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks).append("/").append(QInputDialog::getText(this,"Name","Enter a name"));
+    QFile::copy(startpath,dest);};
 }
 
 
