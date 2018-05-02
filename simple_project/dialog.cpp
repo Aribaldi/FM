@@ -51,15 +51,43 @@ void Dialog::on_pushButton_2_clicked()
     dirmodel->mkdir(index,name);
 }
 
+static bool copyRecursively(const QString &srcFilePath, const QString &tgtFilePath)
+{
+    QFileInfo srcFileInfo(srcFilePath);
+    if (srcFileInfo.isDir())
+    {QDir targetDir(tgtFilePath);
+     targetDir.cdUp();
+     if (!targetDir.mkdir(QFileInfo(tgtFilePath).fileName()))
+         return false;
+     QDir sourceDir(srcFilePath);
+     QStringList fileNames = sourceDir.entryList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot | QDir::Hidden | QDir::System);
+     foreach (const QString &filename, fileNames) {
+     const QString newSrcFilePath = srcFilePath + QLatin1Char('/') + filename;
+     const QString newTgtFilePath = tgtFilePath + QLatin1Char('/') + filename;
+     if (!copyRecursively(newSrcFilePath,newTgtFilePath))
+         return false;
+     }
+    } else {
+        if(!QFile::copy(srcFilePath,tgtFilePath))
+            return false;
+    }
+    return true;
+}
+
 void Dialog::ProvideContextMenu_dirs(const QPoint &pos)
 {
     QModelIndex index = ui->treeView->currentIndex();
+    QString startpath = dirmodel->filePath(index);
     QPoint item = ui->treeView->mapToGlobal(pos);
     QMenu submenu;
     submenu.addAction("Remove");
+    submenu.addAction("Copy");
     QAction* rightClickItem = submenu.exec(item);
     if (rightClickItem && rightClickItem->text().contains("Remove"))
     {dirmodel->remove(index);};
+    if (rightClickItem && rightClickItem->text().contains("Copy"))
+    {QString dest  =  QFileDialog::getExistingDirectory(this,tr("Open a directory"),"/home",QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks).append("/").append(dirmodel->fileName(index));
+     copyRecursively(startpath,dest);};
 }
 
 void Dialog::ProvideContextMenu_files(const QPoint &pos)
@@ -74,7 +102,7 @@ void Dialog::ProvideContextMenu_files(const QPoint &pos)
     if (rightClickItem && rightClickItem->text().contains("Remove"))
     {filemodel->remove(index);};
     if (rightClickItem && rightClickItem->text().contains("Copy"))
-    {QString dest = QFileDialog::getExistingDirectory(this,tr("Open directory"),"/home",QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks).append("/").append(QInputDialog::getText(this,"Name","Enter a name"));
+    {QString dest = QFileDialog::getExistingDirectory(this,tr("Open directory"),"/home",QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks).append("/").append(QInputDialog::getText(this,"Name","Enter a new name"));
     QFile::copy(startpath,dest);};
 }
 
