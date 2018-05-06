@@ -13,6 +13,8 @@
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QMenu>
+#include <QItemSelectionModel>
+#include <QLine>
 
 namespace Ui {
 class Dialog;
@@ -27,11 +29,7 @@ public:
     ~Dialog();
 
 private slots:
-    void on_treeView_clicked(const QModelIndex &index);
-
-    void on_pushButton_clicked();
-
-    void on_pushButton_2_clicked();
+    void GetModelUpdate(const QModelIndex &index);
 
     void ProvideContextMenu_dirs(const QPoint &);
 
