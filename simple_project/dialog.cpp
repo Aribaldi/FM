@@ -7,30 +7,30 @@ Dialog::Dialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    QString Spath = QDir::homePath();
+    QString path = QDir::homePath();
     dirmodel = new QFileSystemModel(this);
     dirmodel->setFilter(QDir::NoDotAndDotDot | QDir::AllDirs);
-    dirmodel ->setRootPath(Spath);
+    dirmodel ->setRootPath(path);
     dirmodel->setReadOnly(false);
     ui->treeView->setModel(dirmodel);
     ui->treeView->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->treeView,
             SIGNAL(customContextMenuRequested(const QPoint &)),
             this,
-            SLOT(ProvideContextMenu_dirs(const QPoint &)));
+            SLOT(provideContextMenu_dirs(const QPoint &)));
     connect(ui->treeView->selectionModel(),
             SIGNAL(currentChanged(QModelIndex,QModelIndex)),
             this,
-            SLOT(GetModelUpdate(const QModelIndex)));
+            SLOT(onModelUpdated(const QModelIndex)));
 
     filemodel  = new QFileSystemModel(this);
     filemodel->setFilter(QDir::NoDotAndDotDot | QDir::Files);
-    filemodel ->setRootPath(Spath);
+    filemodel ->setRootPath(path);
     filemodel->setReadOnly(false);
     ui->listView->setModel(filemodel);
     ui->listView->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->listView, SIGNAL(customContextMenuRequested(const QPoint &)),
-            this, SLOT(ProvideContextMenu_files(const QPoint &)));
+            this, SLOT(provideContextMenu_files(const QPoint &)));
 }
 
 Dialog::~Dialog()
@@ -38,16 +38,16 @@ Dialog::~Dialog()
     delete ui;
 }
 
-void Dialog::GetModelUpdate(const QModelIndex &index)
+void Dialog::onModelUpdated(const QModelIndex &index)
 {
     QDir::Filters NFilters = filemodel->filter();
-    QString Spath = dirmodel->fileInfo(index).absoluteFilePath();
-    ui->listView->setRootIndex(filemodel->setRootPath(Spath));
+    QString path = dirmodel->fileInfo(index).absoluteFilePath();
+    ui->listView->setRootIndex(filemodel->setRootPath(path));
     filemodel->setFilter(QDir::Hidden);
     filemodel->setFilter(NFilters);
 }
 
-static bool CopyRecursively(const QString &srcFilePath, const QString &tgtFilePath)
+static bool copyRecursively(const QString &srcFilePath, const QString &tgtFilePath)
 {
     QFileInfo srcFileInfo(srcFilePath);
     if (srcFileInfo.isDir())
@@ -61,7 +61,7 @@ static bool CopyRecursively(const QString &srcFilePath, const QString &tgtFilePa
      {
       const QString newSrcFilePath = srcFilePath + QLatin1Char('/') + filename;
       const QString newTgtFilePath = tgtFilePath + QLatin1Char('/') + filename;
-      if (!CopyRecursively(newSrcFilePath,newTgtFilePath))
+      if (!copyRecursively(newSrcFilePath,newTgtFilePath))
          return false;
      }
     } else {
@@ -71,10 +71,10 @@ static bool CopyRecursively(const QString &srcFilePath, const QString &tgtFilePa
     return true;
 }
 
-void Dialog::ProvideContextMenu_dirs(const QPoint &pos)
+void Dialog::provideContextMenu_dirs(const QPoint &pos)
 {
     QModelIndex index = ui->treeView->currentIndex();
-    QString startpath = dirmodel->filePath(index);
+    QString startPath = dirmodel->filePath(index);
     QPoint item = ui->treeView->mapToGlobal(pos);
     QMenu submenu;
     submenu.addAction("Remove");
@@ -87,7 +87,7 @@ void Dialog::ProvideContextMenu_dirs(const QPoint &pos)
     if (rightClickItem && rightClickItem->text().contains("Copy"))
     {QString dest  =  QFileDialog::getExistingDirectory(this,tr("Open a directory"),
                                                         QDir::homePath(),QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks).append("/").append(dirmodel->fileName(index));
-     CopyRecursively(startpath,dest);
+     copyRecursively(startPath,dest);
     };
 
     if (rightClickItem && rightClickItem->text().contains("Make new directory"))
@@ -99,7 +99,7 @@ void Dialog::ProvideContextMenu_dirs(const QPoint &pos)
     };
 }
 
-void Dialog::ProvideContextMenu_files(const QPoint &pos)
+void Dialog::provideContextMenu_files(const QPoint &pos)
 {
     QModelIndex index = ui->listView->currentIndex();
     QString startpath = filemodel->filePath(index);

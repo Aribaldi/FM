@@ -29,11 +29,11 @@ public:
     ~Dialog();
 
 private slots:
-    void GetModelUpdate(const QModelIndex &index);
+    void onModelUpdated(const QModelIndex &index);
 
-    void ProvideContextMenu_dirs(const QPoint &);
+    void provideContextMenu_dirs(const QPoint &);
 
-    void ProvideContextMenu_files(const QPoint &);
+    void provideContextMenu_files(const QPoint &);
 
 private:
     Ui::Dialog *ui;
